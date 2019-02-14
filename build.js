@@ -1,14 +1,18 @@
 const webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
 const webpackConfig = require('./webpack.config');
-const port = 9989;
 
 const compiler = webpack(webpackConfig);
-const devServer = new WebpackDevServer(compiler, {stats: true});
-// Launch WebpackDevServer.
-devServer.listen(port, '0.0.0.0', err => {
-    if (err) {
-        return console.log(err);
-    }
-    console.log(`WebpackDevServer listening on http://localhost:${port}/`);
-});
+
+// tap each hook
+Object.keys(compiler.hooks).forEach(hook =>
+  compiler.hooks[hook].tap('example', () => console.log(hook))
+);
+
+compiler.watch(
+  {
+    aggregateTimeout: 300
+  },
+  (err, stats) => {
+    console.log('err:', err, 'stats.hasErrors():', stats.hasErrors());
+  }
+);
